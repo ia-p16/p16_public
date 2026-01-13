@@ -1,7 +1,6 @@
 import os
-
-# Set the root directory to scan (current directory or via param)
 import sys
+import urllib.parse
 
 DEFAULT_ROOT = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_MD = "file_paths.md"
@@ -28,7 +27,6 @@ with open(OUTPUT_MD, "w") as md_file:
         # Ignore dirs starting with 'git'
         dirs[:] = [d for d in dirs if not should_ignore_dir(d)]
 
-        # Only process files at the root or in the specified folder
         for file in files:
             if file == OUTPUT_MD or file == SCRIPT_NAME:
                 continue  # Skip the generated file and the script itself
@@ -36,7 +34,8 @@ with open(OUTPUT_MD, "w") as md_file:
                 continue  # Only .pdf files
             rel_path = os.path.relpath(os.path.join(root, file), DEFAULT_ROOT)
             rel_path_url = rel_path.replace(os.sep, "/")
-            full_url = GITHUB_RAW_BASE + rel_path_url
-            md_file.write(f"- {full_url}\n")
+            encoded_url = urllib.parse.quote(rel_path_url)
+            full_url = GITHUB_RAW_BASE + encoded_url
+            md_file.write(f"- [{rel_path_url}]({full_url})\n")
 
 print(f"PDF file URLs written to {OUTPUT_MD}")
